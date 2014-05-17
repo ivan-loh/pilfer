@@ -14,5 +14,8 @@ mvn exec:java -Dexec.mainClass="com.eriad.app.states.Selangor"
 
 ## States Available
 * Perlis
+* Kedah
+* Pulau Pinang
 * Perak
 * Selangor
+* WP Kuala Lumpur
