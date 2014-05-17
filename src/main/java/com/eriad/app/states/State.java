@@ -9,6 +9,8 @@ import java.util.List;
 
 public abstract class State {
 
+    // TODO: Fill in statecodes from http://www.jpn.com.my/state_code.htm
+
     private final List<ICGenerator> generators;
 
     public State() {
