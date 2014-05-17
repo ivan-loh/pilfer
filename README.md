@@ -12,3 +12,7 @@ Download Data For Selangor:
 mvn exec:java -Dexec.mainClass="com.eriad.app.states.Selangor"
 ```
 
+## States Available
+* Perlis
+* Perak
+* Selangor
