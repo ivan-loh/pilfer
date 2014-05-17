@@ -1,6 +1,14 @@
+## Pilfer
+"scripts" to download details about malaysian citizens. Requires a local mongodb to execute. Data will be downloaded into spr.people
+
 ## Compile
 mvn compile
 
-## Execute State
-eg:selangor
-```mvn exec:java -Dexec.mainClass="com.eriad.app.states.Selangor"```
+## Execute
+
+Download Data For Selangor:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.eriad.app.states.Selangor"
+```
+
