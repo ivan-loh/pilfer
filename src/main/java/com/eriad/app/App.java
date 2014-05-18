@@ -1,6 +1,7 @@
 package com.eriad.app;
 
 import com.eriad.app.entity.Person;
+import com.eriad.app.entity.Progress;
 import com.eriad.app.stuff.ICGenerator;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -20,9 +21,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-/**
- * Connect
- */
 public class App {
 
     public static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -35,12 +33,15 @@ public class App {
 
     private final Logger            LOG              = LoggerFactory.getLogger(this.getClass() + "::" + this.toString());
     private final DateTimeFormatter FORMAT           = DateTimeFormat.forPattern("yyMMdd");
+
     private final Datastore         ds;
     private       String            viewState;
+    private final Class<?>          stateClass;
     private       String            eventValidation;
 
-    private App(ServerAddress host, String viewState, String eventValidation) {
+    private App(Class<?> stateClass, ServerAddress host, String viewState, String eventValidation) {
 
+        this.stateClass      = stateClass;
         this.viewState       = viewState;
         this.eventValidation = eventValidation;
 
@@ -135,27 +136,41 @@ public class App {
 
     public final void process(ICGenerator generator) {
 
+
         String generatorID = generator.getGeneratorId();
+        String processID   = stateClass.getName() + ":" + generatorID;
+
+
+        Query<Progress> query    = ds.createQuery(Progress.class).field("processID").equal(processID);
+        Progress currentProgress = query.get();
+        if (currentProgress != null) {
+            generator.moveTo(currentProgress.activeDate, currentProgress.activeCount);
+        }
+
 
         while (generator.hasNext()) {
 
-            Date   activeDate = generator.getActiveDate();
-            int    count      = generator.getActiveCount();
-            String ic         = generator.next();
+            Date   activeDate  = generator.getActiveDate();
+            int    activeCount = generator.getActiveCount();
+            String ic          = generator.next();
 
             LOG.trace("generatorID: " + generatorID);
             LOG.trace("processing:  " + ic);
             LOG.trace("activeDate:  " + activeDate);
-            LOG.trace("count:       " + count);
+            LOG.trace("count:       " + activeCount);
 
             boolean processed = false;
             while (!processed) { processed = _get(ic); }
 
+            Query<Progress>            q   = ds.createQuery(Progress.class).field("processID").equal(processID);
+            UpdateOperations<Progress> ops = ds.createUpdateOperations(Progress.class).set("activeDate", activeDate)
+                                                                                      .set("activeCount", activeCount);
+                                             ds.update(q, ops, true);
         }
 
     }
 
-    public static App createApp() {
+    public static App createApp(Class<?> stateClass) {
 
         Document doc;
         try {
@@ -167,7 +182,7 @@ public class App {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return createApp();
+            return createApp(stateClass);
         }
 
         try {
@@ -175,11 +190,11 @@ public class App {
             String viewState       = doc.getElementById("__VIEWSTATE").val();
             String eventValidation = doc.getElementById("__EVENTVALIDATION").val();
 
-            return new App(new ServerAddress("localhost"), viewState, eventValidation);
+            return new App(stateClass, new ServerAddress("localhost"), viewState, eventValidation);
 
         } catch (UnknownHostException  | NullPointerException e) {
             e.printStackTrace();
-            return createApp();
+            return createApp(stateClass);
         }
 
     }

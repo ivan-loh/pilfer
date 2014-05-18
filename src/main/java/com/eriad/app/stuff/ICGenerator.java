@@ -39,6 +39,11 @@ public class ICGenerator implements Iterator<String> {
     @Override
     public boolean hasNext() { return activeDate.isBefore(endDate); }
 
+    public void moveTo(Date activeDate, int activeCount) {
+        this.activeDate  = new DateTime(activeDate).withTime(0, 0, 0, 0);
+        this.activeCount = activeCount;
+    }
+
     @Override
     public String next() {
 

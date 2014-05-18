@@ -1,23 +1,20 @@
 package com.eriad.app.entity;
 
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexes;
+import org.mongodb.morphia.annotations.*;
 
 import java.util.Date;
 
 @Entity(value = "progress", noClassnameStored = true)
 @Indexes({
-        @Index(value = "generatorID")
+        @Index(value = "processID")
 })
 public class Progress {
 
     @Id public ObjectId _id;
 
-    public String generatorID;
-    public Date   activeDate;
-    public int    activeCount;
+    @Property("pid") public String processID;
+    @Property("ad")  public Date   activeDate;
+    @Property("ac")  public int    activeCount;
 
 }

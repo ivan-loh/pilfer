@@ -20,7 +20,6 @@ public abstract class State {
 
     public void process() {
 
-        App app = App.createApp();
         for (ICGenerator generator : generators) {
 
             LOG.trace("Begin Processing");
@@ -28,7 +27,8 @@ public abstract class State {
             LOG.trace("Year:      " + generator.getYear());
             LOG.trace("StateCode: " + generator.getStateCode());
 
-            app.process(generator);
+            App.createApp(this.getClass())
+               .process(generator);
         }
 
     }
