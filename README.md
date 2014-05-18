@@ -6,6 +6,14 @@
 * maven
 * mongodb
 
+## Installation ?
+
+```bash
+git clone https://github.com/ivan-loh/pilfer.git
+cd pilfer
+mvn compile
+```
+
 ## States Available
 
 | State           | State Class    |
