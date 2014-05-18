@@ -9,13 +9,9 @@ import java.util.List;
 
 public abstract class State {
 
-    // TODO: Fill in statecodes from http://www.jpn.com.my/state_code.htm
-
     private final List<ICGenerator> generators;
 
-    public State() {
-        generators = createList();
-    }
+    public State() { generators = createList(); }
 
     public abstract int[] getStateCodes();
 
@@ -35,8 +31,8 @@ public abstract class State {
 
     }
 
-    public int getBeginAge() { return 22; };
-    public int getEndAge()   {return 114; };
+    public int getBeginAge() { return 22;  }
+    public int getEndAge()   { return 114; }
 
     public List<ICGenerator> createList() {
 
@@ -54,6 +50,5 @@ public abstract class State {
         }
 
         return generators;
-
     }
 }
