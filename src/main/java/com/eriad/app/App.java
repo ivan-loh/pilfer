@@ -136,6 +136,11 @@ public class App {
 
     public final void process(ICGenerator generator) {
 
+        LOG.trace("Begin Processing");
+        LOG.trace("State:     " + stateClass.getName());
+        LOG.trace("Year:      " + generator.getYear());
+        LOG.trace("StateCode: " + generator.getStateCode());
+
 
         String generatorID = generator.getGeneratorId();
         String processID   = stateClass.getName() + ":" + generatorID;

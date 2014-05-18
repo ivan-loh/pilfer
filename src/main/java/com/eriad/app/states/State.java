@@ -3,15 +3,14 @@ package com.eriad.app.states;
 import com.eriad.app.App;
 import com.eriad.app.stuff.ICGenerator;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class State {
 
-    private final Logger            LOG         = LoggerFactory.getLogger(this.getClass() + "::" + this.toString());
     private final List<ICGenerator> generators;
 
     public State() { generators = createList(); }
@@ -20,15 +19,15 @@ public abstract class State {
 
     public void process() {
 
+//        ExecutorService        executors  = Executors.newFixedThreadPool(generators.size());
+        Class<? extends State> stateClass = this.getClass();
+
         for (ICGenerator generator : generators) {
-
-            LOG.trace("Begin Processing");
-            LOG.trace("State:     " + getClass().getName());
-            LOG.trace("Year:      " + generator.getYear());
-            LOG.trace("StateCode: " + generator.getStateCode());
-
-            App.createApp(this.getClass())
-               .process(generator);
+//            executors.execute(
+//                    () -> App.createApp(stateClass)
+//                             .process(generator)
+//            );
+            App.createApp(stateClass).process(generator);
         }
 
     }
