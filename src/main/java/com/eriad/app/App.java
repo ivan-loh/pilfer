@@ -13,6 +13,8 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -23,7 +25,6 @@ import java.util.Date;
  */
 public class App {
 
-
     public static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
     public static final String ORIGIN       = "http://daftarj.spr.gov.my";
     public static final String REFERER      = "http://daftarj.spr.gov.my/DAFTARJ/DaftarjBM.aspx";
@@ -32,16 +33,16 @@ public class App {
     public static final String URL          = "http://daftarj.spr.gov.my/DAFTARJ/DaftarjBM.aspx";
 
 
-    private final DateTimeFormatter FORMAT  = DateTimeFormat.forPattern("yyMMdd");
-    private final Datastore ds;
-    private String viewState;
-    private String eventValidation;
+    private final Logger            LOG              = LoggerFactory.getLogger(this.getClass() + "::" + this.toString());
+    private final DateTimeFormatter FORMAT           = DateTimeFormat.forPattern("yyMMdd");
+    private final Datastore         ds;
+    private       String            viewState;
+    private       String            eventValidation;
 
     private App(ServerAddress host, String viewState, String eventValidation) {
 
         this.viewState       = viewState;
         this.eventValidation = eventValidation;
-
 
         /**
          * DB Stuff
@@ -57,7 +58,7 @@ public class App {
 
     private boolean _get(String ic) {
 
-        System.out.println("Trying:    " + ic);
+        LOG.trace("Trying:    " + ic);
 
         Document doc;
 
@@ -82,8 +83,9 @@ public class App {
 
             doc = response.parse();
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Probably a timeout
+            LOG.trace("Probably a Connection Problem");
+            LOG.trace(e.getMessage(), e);
+            return false;
         }
 
         viewState       = doc.getElementById("__VIEWSTATE").val();
@@ -109,7 +111,9 @@ public class App {
             p.tarikhLahir    = FORMAT.parseDateTime(p.kadPengenalan.substring(0, 6)).toDate();
 
         } catch (Exception e) {
-            return true; // Doesn't Exist so ...
+            LOG.trace("Most likely the record does not exist");
+            LOG.trace(e.getMessage(), e);
+            return true;
         }
 
         Query<Person> query          = ds.createQuery(Person.class).field("kadPengenalan").equal(p.kadPengenalan);
@@ -123,10 +127,9 @@ public class App {
                                                                               .set("parlimen", p.parlimen)
                                                                               .set("negeri", p.negeri)
                                                                               .set("statusRekord", p.statusRekord);
+                                       ds.update(query, ops, true);
 
-        ds.update(query, ops, true);
-
-        System.out.println("Processed: " + ic);
+        LOG.trace("Processed: " + ic);
         return true;
     }
 
@@ -140,10 +143,10 @@ public class App {
             int    count      = generator.getActiveCount();
             String ic         = generator.next();
 
-            System.out.println("generatorID: " + generatorID);
-            System.out.println("processing:  " + ic);
-            System.out.println("activeDate:  " + activeDate);
-            System.out.println("count:       " + count);
+            LOG.trace("generatorID: " + generatorID);
+            LOG.trace("processing:  " + ic);
+            LOG.trace("activeDate:  " + activeDate);
+            LOG.trace("count:       " + count);
 
             boolean processed = false;
             while (!processed) { processed = _get(ic); }

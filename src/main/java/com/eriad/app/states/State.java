@@ -3,12 +3,15 @@ package com.eriad.app.states;
 import com.eriad.app.App;
 import com.eriad.app.stuff.ICGenerator;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class State {
 
+    private final Logger            LOG         = LoggerFactory.getLogger(this.getClass() + "::" + this.toString());
     private final List<ICGenerator> generators;
 
     public State() { generators = createList(); }
@@ -20,11 +23,10 @@ public abstract class State {
         App app = App.createApp();
         for (ICGenerator generator : generators) {
 
-            System.out.println();
-            System.out.println("Begin Processing");
-            System.out.println("State:     " + getClass().getName());
-            System.out.println("Year:      " + generator.getYear());
-            System.out.println("StateCode: " + generator.getStateCode());
+            LOG.trace("Begin Processing");
+            LOG.trace("State:     " + getClass().getName());
+            LOG.trace("Year:      " + generator.getYear());
+            LOG.trace("StateCode: " + generator.getStateCode());
 
             app.process(generator);
         }
