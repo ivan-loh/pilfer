@@ -16,6 +16,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 /**
  * Connect
@@ -55,6 +56,8 @@ public class App {
     }
 
     private boolean _get(String ic) {
+
+        System.out.println("Trying:    " + ic);
 
         Document doc;
 
@@ -123,20 +126,27 @@ public class App {
 
         ds.update(query, ops, true);
 
+        System.out.println("Processed: " + ic);
         return true;
     }
 
     public final void process(ICGenerator generator) {
 
+        String generatorID = generator.getGeneratorId();
+
         while (generator.hasNext()) {
 
-            String ic = generator.next();
-            System.out.println("processing: " + ic);
+            Date   activeDate = generator.getActiveDate();
+            int    count      = generator.getActiveCount();
+            String ic         = generator.next();
+
+            System.out.println("generatorID: " + generatorID);
+            System.out.println("processing:  " + ic);
+            System.out.println("activeDate:  " + activeDate);
+            System.out.println("count:       " + count);
 
             boolean processed = false;
-            while (!processed) {
-                processed = _get(ic);
-            }
+            while (!processed) { processed = _get(ic); }
 
         }
 
@@ -158,9 +168,12 @@ public class App {
         }
 
         try {
-            String viewState = doc.getElementById("__VIEWSTATE").val();
+
+            String viewState       = doc.getElementById("__VIEWSTATE").val();
             String eventValidation = doc.getElementById("__EVENTVALIDATION").val();
+
             return new App(new ServerAddress("localhost"), viewState, eventValidation);
+
         } catch (UnknownHostException  | NullPointerException e) {
             e.printStackTrace();
             return createApp();

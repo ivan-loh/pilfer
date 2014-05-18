@@ -22,8 +22,8 @@ public abstract class State {
 
             System.out.println();
             System.out.println("Begin Processing");
-            System.out.println(this.getClass().getName());
-            System.out.println("Year: " + generator.getYear());
+            System.out.println("State:     " + getClass().getName());
+            System.out.println("Year:      " + generator.getYear());
             System.out.println("StateCode: " + generator.getStateCode());
 
             app.process(generator);
